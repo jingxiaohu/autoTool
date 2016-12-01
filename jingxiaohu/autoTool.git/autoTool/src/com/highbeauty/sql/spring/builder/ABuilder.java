@@ -1,0 +1,181 @@
+package com.highbeauty.sql.spring.builder;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.util.Map;
+
+import com.highbeauty.pinyin.PinYin;
+import com.highbeauty.util.DbInfoUtil;
+
+public class ABuilder {
+	
+	/**
+	 * @param src:false:不写在SRC下 true:写在SRC下
+	 * @param pkg :"test.dao."
+	 * @param tablenames:{"t_radio1","t_radio2"}
+	 * @param ip:127.0.0.1
+	 * @param port:3306
+	 * @param user:root
+	 * @param password:root
+	 * @param databaseName:bag_radio
+	 * @throws Throwable
+	 */
+	public static void  AutoCoder(boolean is_maven,boolean src,String pkg,String[] tablenames,String ip,int port,String user,String password,String databaseName) throws Throwable{ 
+		boolean immediately = true;
+		String appcontext = "";
+		Connection conn = null;
+		for (String tablename : tablenames) {
+			conn = SqlEx.newMysqlConnection(ip,port, databaseName, user, password);
+			Map<String,String>  map = DbInfoUtil.returnRemarkInfo(ip, port, databaseName, user, password, true, "UTF-8", tablename);
+			BeanBuild(is_maven,conn, tablename, pkg, src,map);
+			conn = SqlEx.newMysqlConnection(ip,port, databaseName, user, password);
+			DaoBuild(is_maven,conn, tablename, pkg, src);
+			//conn = SqlEx.newMysqlConnection(ip,port, databaseName, user, password);
+			//ServiceBuild(conn, tablename, appcontext, pkg, src, immediately);
+		}
+		
+	} 
+
+	/**
+	 * @param args
+	 * @throws Exception
+	 */
+	/*public static void main(String[] args) throws Exception {
+		// String driver = "com.mysql.jdbc.Driver";
+		String host = "127.0.0.1";
+		String db = "bag_radio";
+		// int port = 3306;
+		// boolean reconnect = true;
+//		 String encoding = "utf-8";
+		// String url =
+		// "jdbc:mysql://127.0.0.1:3306/accounts?autoReconnect=true&characterEncoding=utf-8";
+		// String user = "root";
+		// String password = "";
+		boolean immediately = true;
+		// String appcontext = AppContext.class.getName();
+		String appcontext = "";
+		String tablename = "t_radio";
+		String pkg = "test.dao.";
+		Connection conn = null;
+		boolean src = false;
+		conn = SqlEx.newMysqlConnection(host, db);
+		BeanBuild(conn, tablename, pkg, src);
+		conn = SqlEx.newMysqlConnection(host, db);
+		DaoBuild(conn, tablename, pkg, src);
+		conn = SqlEx.newMysqlConnection(host, db);
+		ServiceBuild(conn, tablename, appcontext, pkg, src, immediately);
+		//EntityBuild(conn, tablename, appcontext, pkg, src, immediately);
+	}*/
+	public static  void main(String[] args) throws Throwable { 
+		boolean src = true;
+		String pkg = "com.wradio.";
+		String[] tablenames = {"t_radio"};
+		String ip = "127.0.0.1";
+		int port = 3306;
+		String user = "root";
+		String password = "root";
+		String databaseName = "bag_radio";
+//		com.highbeauty.sql.spring.builder.ABuilder.AutoCoder(src, pkg, tablenames, ip, port, user, password, databaseName);
+	}
+	public static void BeanBuild(boolean is_maven,Connection conn, String tablename, String pkg,
+			boolean src,Map<String,String> map) throws Exception {
+
+		String sql = String.format("SELECT * FROM `%s` LIMIT 1", tablename);
+		ResultSet rs = SqlEx.executeQuery(conn, sql);
+		BeanBuilder builder = new BeanBuilder();
+		String xml = builder.build(rs, pkg + "bean", true,map);
+		System.out.println(xml);
+		String filename = file(is_maven,pkg, src, "bean", tablename, "java");
+		writeFile(filename, xml);
+		conn.close();
+	}
+
+	public static void DaoBuild(boolean is_maven,Connection conn, String tablename, String pkg,
+			boolean src) throws Exception {
+
+		String sql = String.format("SELECT * FROM `%s` LIMIT 1", tablename);
+		ResultSet rs = SqlEx.executeQuery(conn, sql);
+		NewDaoBuilder builder = new NewDaoBuilder();
+		String xml = builder.build(conn, rs, pkg + "dao", pkg + "bean");
+		System.out.println(xml);
+		String filename = file(is_maven,pkg, src, "dao", tablename + "Dao", "java");
+		writeFile(filename, xml);
+		conn.close();
+
+	}
+
+	public static void ServiceBuild(boolean is_maven,Connection conn, String tablename,
+			String appcontext, String pkg, boolean src, boolean immediately)
+			throws Exception {
+
+		String sql = String.format("SELECT * FROM `%s` LIMIT 1", tablename);
+		ResultSet rs = SqlEx.executeQuery(conn, sql);
+		ServiceBuilder builder = new ServiceBuilder();
+//		String xml = builder.build(conn, rs, pkg + "internal", pkg + "bean",pkg + "dao", pkg + "entity", appcontext, immediately);
+		String xml = builder.build(conn, rs, pkg + "service", pkg + "bean",pkg + "dao", pkg + "entity", appcontext, immediately);
+		System.out.println(xml);
+//		String filename = file(pkg, src, "internal", tablename + "Internal","java");
+		String filename = file(is_maven,pkg, src, "service", tablename + "Service","java");
+		writeFile(filename, xml);
+		conn.close();
+	}
+
+	public static void EntityBuild(boolean is_maven,Connection conn, String tablename,
+			String appcontext, String pkg, boolean src, boolean immediately)
+			throws Exception {
+		String filename = file(is_maven,pkg, src, "entity", tablename + "Entity", "java");
+		File f = new File(filename);
+		if (f.exists())
+			return;
+		String sql = String.format("SELECT * FROM `%s` LIMIT 1", tablename);
+		ResultSet rs = SqlEx.executeQuery(conn, sql);
+		EntityBuilder builder = new EntityBuilder();
+		String xml = builder.build(conn, rs, pkg + "entity", pkg + "bean", pkg
+				+ "dao", pkg + "internal", appcontext, immediately);
+		System.out.println(xml);
+		// String filename = file(pkg, src, "entity", tablename + "Entity",
+		// "java");
+		// File f = new File(filename);
+		// if (!f.exists())
+		writeFile(filename, xml);
+		conn.close();
+	}
+
+	public static String file(boolean is_maven,String pkg, boolean src, String type,
+			String tablename, String ext) {
+		String path = StrEx.pkg2Path(pkg);
+		
+		if(is_maven){
+			//是maven项目
+			if (src)
+				path = "src/main/java/" + path;
+			path = path + type + "/"
+					+ StrEx.upperFirst(PinYin.getShortPinYin(tablename)) + "."
+					+ ext;
+			
+		}else{
+			if (src)
+				path = "src/" + path;
+			path = path + type + "/"
+					+ StrEx.upperFirst(PinYin.getShortPinYin(tablename)) + "."
+					+ ext;
+		}
+		
+		
+		return path;
+	}
+
+	public static void writeFile(String f, String s) throws Exception {
+		File file = new File(f);
+		if(file != null && !file.exists()){
+			file.mkdirs();
+			file.delete();
+		}
+		FileOutputStream fos = new FileOutputStream(f);
+		fos.write(s.getBytes());
+		fos.close();
+	}
+}
