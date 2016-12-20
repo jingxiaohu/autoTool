@@ -122,7 +122,50 @@ public class DbInfoUtil {
           
         return map;  
     }  
-    
+    /** 
+     * 根据数据库的连接参数，获取指定表的基本信息：字段名、字段类型、字段注释 
+     * @param driver 数据库连接驱动 
+     * @param url 数据库连接url 
+     * @param user  数据库登陆用户名 
+     * @param pwd 数据库登陆密码 
+     * @param table 表名 
+     * @return Map集合 
+     */  
+    public static Map<String,String> getTableInfoDOC(String driver,String url,String user,String pwd,String table){  
+    	Map<String,String> map = new HashMap<String,String>(); 
+        Connection conn = null;  
+        Statement stmt = null;
+        try {  
+            conn = getConnections(driver,url,user,pwd);  
+            stmt = conn.createStatement();  
+            ResultSet rs = stmt.executeQuery("show full columns from " + table);  
+            while (rs.next()) {  
+//              System.out.println("字段名："+rs.getString("Field")+"--字段注释："+rs.getString("Comment")+"--字段数据类型："+rs.getString("Type"));
+	        	Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+	            Matcher m = p.matcher(rs.getString("Comment"));
+	            String dest = m.replaceAll("");
+	        	String str_remark = dest.trim();
+	        	System.out.println(str_remark);
+	            String colName = rs.getString("Field");  
+	            map.put(colName, str_remark);  
+            }  
+        } catch (SQLException e) {  
+            e.printStackTrace();  
+        } catch (Exception e) {  
+            e.printStackTrace();  
+        }finally{  
+            try { 
+            	if(conn != null)
+                   conn.close(); 
+            	if(stmt != null)
+            		stmt.close();
+            } catch (SQLException e) {  
+                e.printStackTrace();  
+            }  
+        }  
+          
+        return map;  
+    }  
     
     private static String changeDbType(String dbType) {  
         dbType = dbType.toUpperCase();  
@@ -205,6 +248,15 @@ public class DbInfoUtil {
       return  getTableInfo2(driver,url,user,pwd,tablename);  
     }  
       
+    
+    public static Map<String,String>  returnRemarkInfoDOC(String ip,int port,String db,String user,String pwd,boolean reconnect,String encoding,String tablename) {  
+    	 String driver = ("com.mysql.jdbc.Driver");
+		 String s = "jdbc:mysql://%s:%d/%s?autoReconnect=%s&characterEncoding=%s";
+		 String url = String.format(s, ip, port, db,String.valueOf(reconnect), encoding);
+         System.out.println(url);
+          
+      return  getTableInfoDOC(driver,url,user,pwd,tablename);  
+    } 
     
     public static void main(String[] args) {
       String user = "root"; 

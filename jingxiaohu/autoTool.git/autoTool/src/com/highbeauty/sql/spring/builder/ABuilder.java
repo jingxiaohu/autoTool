@@ -33,6 +33,10 @@ public class ABuilder {
 			BeanBuild(is_maven,conn, tablename, pkg, src,map);
 			conn = SqlEx.newMysqlConnection(ip,port, databaseName, user, password);
 			DaoBuild(is_maven,conn, tablename, pkg, src);
+			
+			conn = SqlEx.newMysqlConnection(ip,port, databaseName, user, password);
+			map = DbInfoUtil.returnRemarkInfoDOC(ip, port, databaseName, user, password, true, "UTF-8", tablename);
+			DocBuild(is_maven,conn, tablename, pkg, src,map);
 			//conn = SqlEx.newMysqlConnection(ip,port, databaseName, user, password);
 			//ServiceBuild(conn, tablename, appcontext, pkg, src, immediately);
 		}
@@ -144,6 +148,35 @@ public class ABuilder {
 		conn.close();
 	}
 
+	/**
+	 * 文档处理
+	 * @param is_maven
+	 * @param conn
+	 * @param tablename
+	 * @param pkg
+	 * @param src
+	 * #########返回字段说明
+
+|名称|描述|类型|
+|--------|----|--------|-------|
+| resend_time| 验证码再次发送的时间|字符串|
+| verify_list| 验证序列码|字符串|
+	 * @throws Exception
+	 */
+	public static void DocBuild(boolean is_maven,Connection conn, String tablename, String pkg,
+			boolean src,Map<String,String> map) throws Exception {
+
+		String sql = String.format("SELECT * FROM `%s` LIMIT 1", tablename);
+		ResultSet rs = SqlEx.executeQuery(conn, sql);
+		DocBuilder builder = new DocBuilder();
+		String xml = builder.build(rs,map);
+		System.out.println(xml);
+		String filename = file(is_maven,pkg, src, "doc", tablename, "TXT");
+		writeFile(filename, xml);
+		conn.close();
+
+	}
+	
 	public static String file(boolean is_maven,String pkg, boolean src, String type,
 			String tablename, String ext) {
 		String path = StrEx.pkg2Path(pkg);
