@@ -157,11 +157,23 @@ public class NewDaoBuilder {
   sb.append("\r\n");
  
   sb.append("\r\n");
-  sb.append("    public  String TABLE = \"" + tableName + "\";\r\n");
+  sb.append("    private  String TABLE = \"" + tableName + "\";\r\n");
   sb.append("\r\n");
  
-  sb.append("    public  String TABLENAME = \"" + tableName + "\";\r\n");
+  sb.append("    private  String TABLENAME = \"" + tableName + "\";\r\n");
   sb.append("\r\n");
+  
+  
+  sb.append("    public  String getTABLE(){\r\n");
+  sb.append("        return  TABLE;\r\n");
+  sb.append("    }\r\n");
+  sb.append("\r\n");
+  
+  sb.append("    public  String getTABLENAME(){\r\n");
+  sb.append("        return  TABLENAME;\r\n");
+  sb.append("    }\r\n");
+  sb.append("\r\n");
+  
   sb.append("    public  String TABLEMM(){\r\n");
   sb.append("        return ").append("TABLE + ").append("sdfMm.format(new java.util.Date());\r\n");
   sb.append("    }\r\n");
@@ -171,7 +183,7 @@ public class NewDaoBuilder {
   sb.append("    }\r\n");
   sb.append("\r\n");
  
-  sb.append("    public javax.sql.DataSource ds;\r\n");
+//  sb.append("    public javax.sql.DataSource ds;\r\n");
   sb.append("\r\n");
   String key = AutoIncrement.getAutoIncrement(rsmd);
   if (key == null){
@@ -181,10 +193,29 @@ public class NewDaoBuilder {
   String fields2 = getFields(rsmd, key, false);
   String fieldArrays = getFieldArrayString(rsmd, key);
  
-  sb.append("    public  String[] carrays ="+fieldArrays + ";\r\n");
-  sb.append("    public  String coulmns =\""+fields + "\";\r\n");
-  sb.append("    public  String coulmns2 =\""+fields2+"\";\r\n");
+  sb.append("    private  String[] carrays ="+fieldArrays + ";\r\n");
+  sb.append("    private  String coulmns =\""+fields + "\";\r\n");
+  sb.append("    private  String coulmns2 =\""+fields2+"\";\r\n");
   sb.append("\r\n");
+  
+  
+  sb.append("    public  String[] getCarrays(){\r\n");
+  sb.append("        return  carrays;\r\n");
+  sb.append("    }\r\n");
+  sb.append("\r\n");
+  
+  sb.append("    public  String getCoulmns(){\r\n");
+  sb.append("        return  coulmns;\r\n");
+  sb.append("    }\r\n");
+  sb.append("\r\n");
+  
+  
+  sb.append("    public  String getCoulmns2(){\r\n");
+  sb.append("        return  coulmns2;\r\n");
+  sb.append("    }\r\n");
+  sb.append("\r\n");
+  
+  
   return sb.toString();
  }
  static String generateConstruct(ResultSetMetaData rsmd, String tableName) {
