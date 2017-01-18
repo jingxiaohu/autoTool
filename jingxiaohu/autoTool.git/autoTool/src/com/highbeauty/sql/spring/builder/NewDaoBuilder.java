@@ -551,7 +551,7 @@ public class NewDaoBuilder {
   sb.append("            return (" + beanName+ ")_np.queryForObject(sql, param, new BeanPropertyRowMapper<"+beanName+">(" + beanName + ".class));\r\n");
   sb.append("        }catch(Exception e){\r\n");
   sb.append("            //createTable(TABLENAME2);\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\""+key+"=\"+"+key+",e);").append("\r\n");
   sb.append("            return null;\r\n");
   sb.append("        }\r\n");
   sb.append("    }\r\n");
