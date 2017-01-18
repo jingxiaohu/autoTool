@@ -10,7 +10,7 @@ import java.util.Vector;
 import com.highbeauty.pinyin.PinYin;
 public class NewDaoBuilder {
  private static String primarykey = null;//主键
- private String autoIndex = null;//自增索引
+// private String autoIndex = null;//自增索引
  
  public static void main(String[] args) throws Exception {
   String sql = "SELECT * FROM `建筑` LIMIT 1";
@@ -29,7 +29,12 @@ public class NewDaoBuilder {
   String tableName = rsmd.getTableName(1);
   Map<String, List<String>> indexs = IndexBuilder.getIndex(conn, rsmd);
   //定义主键字段
-  primarykey = indexs.get("PRIMARY").get(0);
+  if(indexs != null && indexs.size()>0){
+	  if(indexs.get("PRIMARY") != null && indexs.get("PRIMARY").size() > 0){
+		  primarykey = indexs.get("PRIMARY").get(0);
+	  }
+  }
+  
   StringBuffer sb = new StringBuffer();
   // import
   // sb.append("import java.io.*;");
@@ -77,8 +82,6 @@ public class NewDaoBuilder {
   String classname = StrEx.upperFirst(PinYin.getShortPinYin(tableName))+"Dao";
   sb.append("    Logger log = Logger.getLogger("+classname+".class)").append(";");
   sb.append("\r\n");
-  String db = rsmd.getCatalogName(1);
-  List<MyIndex> myi = MyIndex.Indexs(conn, db, tableName);
   System.out.println("-----------------------");
   // default
   sb.append(generateDef(rsmd, tableName));
@@ -88,54 +91,32 @@ public class NewDaoBuilder {
   sb.append(generateInsert(rsmd, tableName));
   // batch insert
   sb.append(generateBatchInsert(rsmd, tableName));
-  // delete
-  sb.append(generateDelete(rsmd, tableName));
-  // batch delete
-  sb.append(generateBatchDelete(rsmd, tableName));
-  // selectAll
-  sb.append(generateSelectAll(rsmd, tableName));
-  // Select
-  sb.append(generateSelect(rsmd, tableName));
-  // SelectByIndex
-  List<String> ikeys = new Vector<String>();
-  ikeys.addAll(indexs.keySet());
-  for (String ikey : ikeys) {
-   List<String> idxs = indexs.get(ikey);
-   System.out.println(ikey);
-   MyIndex mi = null;
-   for (MyIndex i : myi) {
-    if (i.mz.equals(ikey)) {
-     mi = i;
-     break;
-    }
-   }
-   if (!ikey.equals("PRIMARY"))
-    sb.append(generateSelectByIndex(rsmd, tableName, idxs, mi));
+  
+  if(primarykey != null){
+	// selectAll
+	  sb.append(generateSelectAll(rsmd, tableName));
+	  // Select
+	  sb.append(generateSelect(rsmd, tableName));
   }
+
   // count
   sb.append(generateCount(rsmd, tableName));
-  for (String ikey : ikeys) {
-   List<String> idxs = indexs.get(ikey);
-   System.out.println(ikey);
-   MyIndex mi = null;
-   for (MyIndex i : myi) {
-    if (i.mz.equals(ikey)) {
-     mi = i;
-     break;
-    }
-   }
-   if (!ikey.equals("PRIMARY"))
-    sb.append(generateIndexCount(rsmd, tableName, idxs, mi));
-  }
   // selectByPage
   sb.append(generateSelectByPage(rsmd, tableName));
-  // Update
-  sb.append(generateUpdate(rsmd, tableName));
-  // batch update
-  sb.append(generateBatchUpdate(rsmd, tableName));
+ 
+  if(primarykey != null){
+	  // Update
+	  sb.append(generateUpdate(rsmd, tableName));
+	  // batch update
+	  sb.append(generateBatchUpdate(rsmd, tableName));
+	  // delete
+	  sb.append(generateDelete(rsmd, tableName));
+	  // batch delete
+	  sb.append(generateBatchDelete(rsmd, tableName));
+  }
+
   // create table
   sb.append(generateCreateTable(conn, rs, rsmd, tableName));
- 
   // truncate
   sb.append(generateTruncate(rsmd, tableName));
   // repair
@@ -274,12 +255,12 @@ public class NewDaoBuilder {
   fields = getFields(rsmd, key, true);
   values = getValues(rsmd, key, true);
   sb.append("    //添加数据\r\n");
-  sb.append("    public int insert2(" + beanName + " bean) throws SQLException{\r\n");
-  sb.append("        return insert2(bean, TABLENAME);\r\n");
+  sb.append("    public int insert_primarykey(" + beanName + " bean) throws SQLException{\r\n");
+  sb.append("        return insert_primarykey(bean, TABLENAME);\r\n");
   sb.append("    }\r\n");
   sb.append("\r\n");
   sb.append("    //添加数据\r\n");
-  sb.append("    public int insert2(" + beanName + " bean, String TABLENAME2) throws SQLException{\r\n");
+  sb.append("    public int insert_primarykey(" + beanName + " bean, String TABLENAME2) throws SQLException{\r\n");
   sb.append("        String sql;\r\n");
   sb.append("        try{\r\n");
   sb.append("            sql = \"INSERT INTO \"+TABLENAME2+\" (" + fields + ") VALUES (" + values + ")\";\r\n");
@@ -369,13 +350,6 @@ public class NewDaoBuilder {
   if (key == null){
 	   key = primarykey;
   }
-  // public int deleteById(int id) {
-  // String sql;
-  // sql = "DELETE \"+TABLENAME+\" WHERE id=:id";
-  // Map param = new HashMap();
-  // param.put("id", id);
-  // return _np.update(sql, param);
-  // }
   String javaType = JavaType.getType(rsmd, key);
   sb.append("    //删除单条数据\r\n");
   sb.append("    public int deleteByKey(" + javaType + " " + key + ") throws SQLException{\r\n");
@@ -406,27 +380,6 @@ public class NewDaoBuilder {
   if (key == null){
 	   key = primarykey;
   }
-  // public int[] deleteByKey(final Integer[] keys) {
-  // String sql;
-  // try{
-  // sql = "DELETE FROM 用户角色 WHERE id=?";
-  // return _np.getJdbcOperations().batchUpdate(sql, new
-  // BatchPreparedStatementSetter() {
-  // @Override
-  // public int getBatchSize() {
-  // return keys.length;
-  // }
-  // @Override
-  // public void setValues(PreparedStatement ps, int i) throws
-  // SQLException {
-  // ps.setInt(1, keys[i]);
-  // }
-  // });
-  // }catch(Exception e){
-  // e.printStackTrace();
-  // return new int[0];
-  // }
-  // }
   String javaType = JavaType.getType(rsmd, key);
   sb.append("    //批量删除数据\r\n");
   sb.append("    public int[] deleteByKey("+javaType+"[] keys) throws SQLException{\r\n");
@@ -1075,7 +1028,7 @@ public class NewDaoBuilder {
   int count = rsmd.getColumnCount();
   for (int i = 1; i <= count; i++) {
    String columnName = rsmd.getColumnName(i);
-   if (key.equals(columnName) && !bkey)
+   if (key != null && key.equals(columnName) && !bkey)
     continue;
    fields.append(columnName);
    if (i < count) {
@@ -1090,7 +1043,7 @@ public class NewDaoBuilder {
   int count = rsmd.getColumnCount();
   for (int i = 1; i <= count; i++) {
    String columnName = rsmd.getColumnName(i);
-   if (key.equals(columnName) && !bkey)
+   if (key != null && key.equals(columnName) && !bkey)
     continue;
    fields.add(columnName);
   }
@@ -1118,7 +1071,7 @@ public class NewDaoBuilder {
   int count = rsmd.getColumnCount();
   for (int i = 1; i <= count; i++) {
    String columnName = rsmd.getColumnName(i);
-   if (key.equals(columnName) && !bkey)
+   if (key != null &&  key.equals(columnName) && !bkey)
     continue;
    values.append(":").append(columnName);
    if (i < count) {
@@ -1133,7 +1086,7 @@ public class NewDaoBuilder {
   int count = rsmd.getColumnCount();
   for (int i = 1; i <= count; i++) {
    String columnName = rsmd.getColumnName(i);
-   if (key.equals(columnName) && !bkey)
+   if (key != null && key.equals(columnName) && !bkey)
     continue;
    values.append("?");
    if (i < count) {
