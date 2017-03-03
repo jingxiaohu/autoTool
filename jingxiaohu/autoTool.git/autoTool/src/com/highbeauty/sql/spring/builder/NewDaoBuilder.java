@@ -501,7 +501,8 @@ public class NewDaoBuilder {
   sb.append("            sql=\"SELECT "+fields+" FROM \"+TABLENAME2+\" WHERE "+key+"=:"+key+"\";\r\n");
   sb.append("            Map<String,Object> param = new HashMap<String,Object>();\r\n");
   sb.append("            param.put(\""+key+"\", "+key+");\r\n");
-  sb.append("            return (" + beanName+ ")_np.queryForObject(sql, param, new BeanPropertyRowMapper<"+beanName+">(" + beanName + ".class));\r\n");
+  sb.append("            List<" + beanName+ "> list =  _np.query(sql, param, new BeanPropertyRowMapper<"+beanName+">(" + beanName + ".class));\r\n");
+  sb.append("            return (list == null || list.size() == 0) ? null : list.get(0);\r\n");
   sb.append("        }catch(Exception e){\r\n");
   sb.append("            //createTable(TABLENAME2);\r\n");
   sb.append("            log.error(\""+key+"=\"+"+key+",e);").append("\r\n");
