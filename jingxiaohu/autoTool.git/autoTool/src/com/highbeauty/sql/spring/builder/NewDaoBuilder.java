@@ -243,7 +243,7 @@ public class NewDaoBuilder {
   sb.append("            return keyholder.getKey().intValue();\r\n");
   sb.append("        }catch(Exception e){\r\n");
   sb.append("            //createTable(TABLENAME2);\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"insert\", e);").append("\r\n");
 //	 sb.append("            return 0;\r\n");
   sb.append("            throw new SQLException(\"insert is error\", e);\r\n");
   sb.append("        }\r\n");
@@ -273,7 +273,7 @@ public class NewDaoBuilder {
   sb.append("            return _np.update(sql, ps);\r\n");
   sb.append("        }catch(Exception e){\r\n");
   sb.append("            //createTable(TABLENAME2);\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"insert_primarykey\", e);").append("\r\n");
 //	 sb.append("            return 0;\r\n");
   sb.append("            throw new SQLException(\"insert2 is error\", e);\r\n");
   sb.append("        }\r\n");
@@ -333,7 +333,7 @@ public class NewDaoBuilder {
   sb.append("            });\r\n");
   sb.append("        }catch(Exception e){\r\n");
   sb.append("            //createTable(TABLENAME2);\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"int[] insert\", e);").append("\r\n");
 //	 sb.append("            return new int[0];\r\n");
   sb.append("            throw new SQLException(\"insert is error\", e);\r\n");
   sb.append("        }\r\n");
@@ -367,7 +367,7 @@ public class NewDaoBuilder {
   sb.append("            param.put(\"" + key  +"\", " + key + ");\r\n");
   sb.append("            return _np.update(sql, param);\r\n");
   sb.append("        }catch(Exception e){\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"deleteByKey\", e);").append("\r\n");
 //	 sb.append("            return 0;\r\n");
   sb.append("            throw new SQLException(\"deleteByKey is error\", e);\r\n");
   sb.append("        }\r\n");
@@ -404,7 +404,7 @@ public class NewDaoBuilder {
   sb.append("                }\r\n");
   sb.append("            });\r\n");
   sb.append("        }catch(Exception e){\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"int[] deleteByKey\", e);").append("\r\n");
 //	 sb.append("            return new int[0];\r\n");
   sb.append("            throw new SQLException(\"deleteByKey is error\", e);\r\n");
   sb.append("        }\r\n");
@@ -434,7 +434,7 @@ public class NewDaoBuilder {
   sb.append("            return _np.getJdbcOperations().query(sql, new BeanPropertyRowMapper<"+beanName+">(" + beanName + ".class));\r\n");
   sb.append("        }catch(Exception e){\r\n");
   sb.append("            //createTable(TABLENAME2);\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"selectAll\", e);").append("\r\n");
   sb.append("            return new ArrayList<"+beanName+">();\r\n");
   sb.append("        }\r\n");
   sb.append("    }\r\n");
@@ -452,7 +452,7 @@ public class NewDaoBuilder {
   sb.append("            return _np.getJdbcOperations().query(sql, new BeanPropertyRowMapper<"+beanName+">(" + beanName + ".class));\r\n");
   sb.append("        }catch(Exception e){\r\n");
   sb.append("            //createTable(TABLENAME2);\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"selectLast\", e);").append("\r\n");
   sb.append("            return new ArrayList<"+beanName+">();\r\n");
   sb.append("        }\r\n");
   sb.append("    }\r\n");
@@ -485,7 +485,7 @@ public class NewDaoBuilder {
   sb.append("            return _np.query(sql, param, new BeanPropertyRowMapper<"+beanName+">("+ beanName + ".class));\r\n");
   sb.append("        }catch(Exception e){\r\n");
   sb.append("            //createTable(TABLENAME2);\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"selectGtKey\", e);").append("\r\n");
   sb.append("            return new ArrayList<"+beanName+">();\r\n");
   sb.append("        }\r\n");
   sb.append("    }\r\n");
@@ -507,7 +507,7 @@ public class NewDaoBuilder {
   sb.append("            return (list == null || list.size() == 0) ? null : list.get(0);\r\n");
   sb.append("        }catch(Exception e){\r\n");
   sb.append("            //createTable(TABLENAME2);\r\n");
-  sb.append("            log.error(\""+key+"=\"+"+key+",e);").append("\r\n");
+  sb.append("            log.error(selectByKey\""+key+"=\"+"+key+",e);").append("\r\n");
   sb.append("            return null;\r\n");
   sb.append("        }\r\n");
   sb.append("    }\r\n");
@@ -640,7 +640,7 @@ public class NewDaoBuilder {
   if (wy) {
    sb.append("            return null;\r\n");
   } else {
-   sb.append("            log.error(e);").append("\r\n");
+   sb.append("            log.error(\"generateSelectByIndex\",e);").append("\r\n");
    sb.append("            return new Vector<"+beanName+">();\r\n");
   }
   sb.append("        }\r\n");
@@ -664,7 +664,7 @@ public class NewDaoBuilder {
   sb.append("            return _np.getJdbcOperations().queryForObject(sql,Integer.class);\r\n");
   sb.append("        }catch(Exception e){\r\n");
   sb.append("            //createTable(TABLENAME2);\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"count\",e);").append("\r\n");
   sb.append("            return 0;\r\n");
   sb.append("        }\r\n");
   sb.append("    }\r\n");
@@ -768,7 +768,7 @@ public class NewDaoBuilder {
   sb.append("            return _np.getJdbcOperations().queryForInt(sql);\r\n");
   sb.append("        }catch(Exception e){\r\n");
   sb.append("            //createTable(TABLENAME2);\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"generateIndexCount\",e);").append("\r\n");
   sb.append("            return 0;\r\n");
   sb.append("        }\r\n");
   sb.append("    }\r\n");
@@ -796,7 +796,7 @@ public class NewDaoBuilder {
   sb.append("            return _np.getJdbcOperations().query(sql,new BeanPropertyRowMapper<"+beanName+">(" + beanName + ".class));\r\n");
   sb.append("        }catch(Exception e){\r\n");
   sb.append("            //createTable(TABLENAME2);\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"selectByPage\",e);").append("\r\n");
   sb.append("            return new ArrayList<"+beanName+">();\r\n");
   sb.append("        }\r\n");
   sb.append("    }\r\n");
@@ -837,7 +837,7 @@ public class NewDaoBuilder {
   sb.append("            SqlParameterSource ps = new BeanPropertySqlParameterSource(bean);\r\n");
   sb.append("            return _np.update(sql, ps);\r\n");
   sb.append("        }catch(Exception e){\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"updateByKey\",e);").append("\r\n");
   sb.append("            return 0;\r\n");
   sb.append("        }\r\n");
   sb.append("    }\r\n");
@@ -900,7 +900,7 @@ public class NewDaoBuilder {
   sb.append("                }\r\n");
   sb.append("            });\r\n");
   sb.append("        }catch(Exception e){\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"int[] updateByKey\",e);").append("\r\n");
 //	 sb.append("            return new int[0];\r\n");
   sb.append("            throw new SQLException(\"updateByKey is error\", e);\r\n");
   sb.append("        }\r\n");
@@ -940,7 +940,7 @@ public class NewDaoBuilder {
   sb.append("            sql  = EasyTemplate.make(sql, params);\r\n");
   sb.append("            _np.getJdbcOperations().execute(sql);\r\n");
   sb.append("        }catch(Exception e){\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"createTable\",e);").append("\r\n");
   sb.append("            throw new SQLException(\"createTable is error\", e);\r\n");
   sb.append("        }\r\n");
   sb.append("    }\r\n");
@@ -961,7 +961,7 @@ public class NewDaoBuilder {
   sb.append("            sql=\"TRUNCATE TABLE \"+TABLENAME2+\"\";\r\n");
   sb.append("            _np.getJdbcOperations().execute(sql);\r\n");
   sb.append("        }catch(Exception e){\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"truncate\",e);").append("\r\n");
   sb.append("            throw new SQLException(\"truncate is error\", e);\r\n");
   sb.append("        }\r\n");
   sb.append("    }\r\n");
@@ -982,7 +982,7 @@ public class NewDaoBuilder {
   sb.append("            sql=\"REPAIR TABLE \"+TABLENAME2+\"\";\r\n");
   sb.append("            _np.getJdbcOperations().execute(sql);\r\n");
   sb.append("        }catch(Exception e){\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"repair\",e);").append("\r\n");
   sb.append("        }\r\n");
   sb.append("    }\r\n");
   sb.append("\r\n");
@@ -1003,7 +1003,7 @@ public class NewDaoBuilder {
   sb.append("            sql=\"OPTIMIZE TABLE \"+TABLENAME2+\"\";\r\n");
   sb.append("            _np.getJdbcOperations().execute(sql);\r\n");
   sb.append("        }catch(Exception e){\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"optimize\",e);").append("\r\n");
   sb.append("        }\r\n");
   sb.append("    }\r\n");
   sb.append("\r\n");
@@ -1016,7 +1016,7 @@ public class NewDaoBuilder {
   sb.append("        try{\r\n");
   sb.append("            _np.getJdbcOperations().execute(sql);\r\n");
   sb.append("        }catch(Exception e){\r\n");
-  sb.append("            log.error(e);").append("\r\n");
+  sb.append("            log.error(\"execute\",e);").append("\r\n");
   sb.append("            throw new SQLException(\"execute is error\", e);\r\n");
   sb.append("        }\r\n");
   sb.append("    }\r\n");
