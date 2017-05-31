@@ -656,7 +656,7 @@ public class NewDaoBuilder {
   sb.append("    }\r\n");
   sb.append("\r\n");
   sb.append("    //所有数据总数\r\n");
-  sb.append("    @SuppressWarnings(\"deprecation\")\r\n");
+//  sb.append("    @SuppressWarnings(\"deprecation\")\r\n");
   sb.append("    public int count(String TABLENAME2) {\r\n");
   sb.append("        String sql;\r\n");
   sb.append("        try{\r\n");
