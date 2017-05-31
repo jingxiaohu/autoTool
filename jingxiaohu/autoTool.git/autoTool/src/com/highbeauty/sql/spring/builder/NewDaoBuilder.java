@@ -44,7 +44,9 @@ public class NewDaoBuilder {
    sb.append("\r\n");
    sb.append("\r\n");
   }
-  sb.append("import org.apache.log4j.Logger;");
+//  sb.append("import org.apache.log4j.Logger;");
+  sb.append("import org.slf4j.Logger;");
+  sb.append("import org.slf4j.LoggerFactory;");
   sb.append("\r\n");
   sb.append("import java.util.*;");
   sb.append("\r\n");
@@ -80,7 +82,7 @@ public class NewDaoBuilder {
   sb.append("\r\n");
   //这里加入日志
   String classname = StrEx.upperFirst(PinYin.getShortPinYin(tableName))+"Dao";
-  sb.append("    Logger log = Logger.getLogger("+classname+".class)").append(";");
+  sb.append("    Logger log = LoggerFactory.getLogger("+classname+".class)").append(";");
   sb.append("\r\n");
   System.out.println("-----------------------");
   // default
