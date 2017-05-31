@@ -507,7 +507,7 @@ public class NewDaoBuilder {
   sb.append("            return (list == null || list.size() == 0) ? null : list.get(0);\r\n");
   sb.append("        }catch(Exception e){\r\n");
   sb.append("            //createTable(TABLENAME2);\r\n");
-  sb.append("            log.error(selectByKey\""+key+"=\"+"+key+",e);").append("\r\n");
+  sb.append("            log.error(\"selectByKey "+key+"=\"+"+key+",e);").append("\r\n");
   sb.append("            return null;\r\n");
   sb.append("        }\r\n");
   sb.append("    }\r\n");
