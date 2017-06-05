@@ -3,7 +3,6 @@ package com.highbeauty.sql.spring.builder;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.util.Map;
 
@@ -24,8 +23,8 @@ public class ABuilder {
 	 * @throws Throwable
 	 */
 	public static void  AutoCoder(boolean is_maven,boolean src,String pkg,String[] tablenames,String ip,int port,String user,String password,String databaseName) throws Throwable{ 
-		boolean immediately = true;
-		String appcontext = "";
+//		boolean immediately = true;
+//		String appcontext = "";
 		Connection conn = null;
 		for (String tablename : tablenames) {
 			conn = SqlEx.newMysqlConnection(ip,port, databaseName, user, password);
@@ -33,13 +32,15 @@ public class ABuilder {
 			BeanBuild(is_maven,conn, tablename, pkg, src,map);
 			conn = SqlEx.newMysqlConnection(ip,port, databaseName, user, password);
 			DaoBuild(is_maven,conn, tablename, pkg, src);
-			
 			conn = SqlEx.newMysqlConnection(ip,port, databaseName, user, password);
 			map = DbInfoUtil.returnRemarkInfoDOC(ip, port, databaseName, user, password, true, "UTF-8", tablename);
 			DocBuild(is_maven,conn, tablename, pkg, src,map);
 			//conn = SqlEx.newMysqlConnection(ip,port, databaseName, user, password);
 			//ServiceBuild(conn, tablename, appcontext, pkg, src, immediately);
 		}
+		
+		//创建DAO代理工厂
+		DaoFactoryBuild(is_maven,tablenames, pkg, src);
 		
 	} 
 
@@ -110,6 +111,17 @@ public class ABuilder {
 		conn.close();
 
 	}
+	
+	public static void DaoFactoryBuild(boolean is_maven,String[] tablenames, String pkg,
+			boolean src) throws Exception {
+
+		NewDaoFactoryBuilder builder = new NewDaoFactoryBuilder();
+		String xml = builder.build(tablenames, pkg+ "dao");
+		System.out.println(xml);
+		String filename = file(is_maven,pkg, src, "dao", "DaoFactory", "java");
+		writeFile(filename, xml);
+	}
+	
 
 	public static void ServiceBuild(boolean is_maven,Connection conn, String tablename,
 			String appcontext, String pkg, boolean src, boolean immediately)
