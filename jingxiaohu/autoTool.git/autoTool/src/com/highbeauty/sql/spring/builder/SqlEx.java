@@ -838,6 +838,7 @@ public class SqlEx {
 				String columnName = MapEx.get(map, "columnName");
 				//注解名称
 				String comment = map_comment.get(columnName);
+				comment = comment.replaceAll("\"", "'");
 				
 				// int columnType = MapEx.get(map, "columnType");
 				// String columnLabel = MapEx.get(map, "columnLabel");
