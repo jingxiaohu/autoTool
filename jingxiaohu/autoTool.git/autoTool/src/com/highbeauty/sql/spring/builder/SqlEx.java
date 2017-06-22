@@ -809,6 +809,149 @@ public class SqlEx {
 		return null;
 	}
 
+	
+	
+	/**
+	 * 
+	 * @param conn
+	 * @param rs
+	 * @param tableName
+	 * @param map_comment
+	 * @param charset_type 0:utf-8 1:utf8mb4
+	 * @param ENGINE_NAME_TYPE 0：MyISAM  1：InnoDB
+	 * @return
+	 * @throws Exception
+	 */
+	public static String createMysqlTable_Comment(Connection conn, ResultSet rs,
+			String tableName,Map<String,String>  map_comment,int charset_type,int ENGINE_NAME_TYPE) throws Exception {
+		try {
+			String ENGINE_NAME = "InnoDB";
+			if(ENGINE_NAME_TYPE == 0){
+				 ENGINE_NAME = "MyISAM";
+			}
+			
+			List<Map<String, Object>> columns = SqlEx.getColumns(rs);
+			StringBuffer sb = new StringBuffer();
+			sb.append("CREATE TABLE IF NOT EXISTS `${TABLENAME}` (\n");
+			for (Map<String, Object> map : columns) {
+				//列名称
+				String columnName = MapEx.get(map, "columnName");
+				//注解名称
+				String comment = map_comment.get(columnName);
+				
+				// int columnType = MapEx.get(map, "columnType");
+				// String columnLabel = MapEx.get(map, "columnLabel");
+				String columnTypeName = MapEx.get(map, "columnTypeName");
+				// String catalogName = MapEx.get(map, "catalogName");
+				// String columnClassName = MapEx.get(map, "columnClassName");
+				int precision = MapEx.get(map, "precision");
+				int scale = MapEx.get(map, "scale");
+				// String schemaName = MapEx.get(map, "schemaName");
+				// String tableName = MapEx.get(map, "tableName");
+				// int columnDisplaySize = MapEx.get(map, "columnDisplaySize");
+				boolean isAutoIncrement = MapEx.get(map, "isAutoIncrement");
+				// boolean isCaseSensitive = MapEx.get(map, "isCaseSensitive");
+				// boolean isCurrency = MapEx.get(map, "isCurrency");
+				// boolean isDefinitelyWritable =
+				// MapEx.get(map,"isDefinitelyWritable");
+				int isNullable = MapEx.get(map, "isNullable");
+				// boolean isReadOnly = MapEx.get(map, "isReadOnly");
+				// boolean isSearchable = MapEx.get(map, "isSearchable");
+				// boolean isSigned = MapEx.get(map, "isSigned");
+				// boolean isWritable = MapEx.get(map, "isWritable");
+
+				// System.out.println(columnTypeName + "/" + precision + "/" +
+				// scale);
+				sb.append("\t");
+				sb.append("`" + columnName + "`");
+				sb.append("  ");
+				if (columnTypeName.equals("VARCHAR") && precision >= 715827882) {
+					sb.append("LONGTEXT");
+				} else if (columnTypeName.equals("VARCHAR") && precision >= 5592405) {
+					sb.append("MEDIUMTEXT");
+				} else if (columnTypeName.equals("VARCHAR") && precision >= 21845) {
+					sb.append("TEXT");
+				} else if (columnTypeName.equals("VARCHAR") && precision >= 255) {
+					sb.append("TINYTEXT");
+				} else if (columnTypeName.equals("MEDIUMBLOB")
+						|| columnTypeName.equals("LONGBLOB")
+						|| columnTypeName.equals("BLOB")
+						|| columnTypeName.equals("TINYBLOB")) {
+					sb.append(columnTypeName);
+				} else if (columnTypeName.equals("DATETIME")
+						|| columnTypeName.equals("DATE")
+						|| columnTypeName.equals("TIME")
+						|| columnTypeName.equals("TIMESTAMP")) {
+					sb.append(columnTypeName);
+				} else if (columnTypeName.equals("DOUBLE")) {
+					sb.append(columnTypeName);
+				} else if (columnTypeName.equals("DECIMAL")) {
+					sb.append(columnTypeName);
+					sb.append("(");
+					sb.append(precision);
+					sb.append(",");
+					sb.append(scale);
+					sb.append(")");
+				} else {
+					sb.append(columnTypeName);
+					sb.append("(");
+					sb.append(precision);
+					sb.append(")");
+				}
+				if (isNullable == 0) {
+					sb.append(" NOT NULL");
+				}
+
+				if (isAutoIncrement) {
+					sb.append(" AUTO_INCREMENT");
+				}
+				if(comment != null){
+					sb.append(" COMMENT '"+comment+"'");
+				}
+				sb.append(",\n");
+				// System.out.println(map);
+			}
+			// List<Map<String, Object>> pks = SqlEx.getPrimaryKeys(conn, t);
+			// for (Map<String, Object> map : pks) {
+			// System.out.println(map);
+			// }
+			List<Map<String, Object>> nouniques = SqlEx.getIndexInfo(conn,
+					tableName, false);
+			int nouniquesLength = nouniques.size();
+			int i = 0;
+			for (Map<String, Object> map : nouniques) {
+				String COLUMN_NAME = MapEx.get(map, "COLUMN_NAME");
+				String INDEX_NAME = MapEx.get(map, "INDEX_NAME");
+				boolean NON_UNIQUE = Boolean.parseBoolean(MapEx.get(map, "NON_UNIQUE").toString());
+				sb.append("\t");
+				if (INDEX_NAME.equals("PRIMARY")) {
+					sb.append("PRIMARY KEY (`" + COLUMN_NAME + "`)");
+				} else if (!NON_UNIQUE) {
+					INDEX_NAME = INDEX_NAME.replace(tableName, "${TABLENAME}");
+					sb.append("UNIQUE KEY `" + INDEX_NAME + "` (`" + COLUMN_NAME
+							+ "`)");
+				} else {
+					INDEX_NAME = INDEX_NAME.replace(tableName, "${TABLENAME}");
+					sb.append("KEY `" + INDEX_NAME + "` (`" + COLUMN_NAME + "`)");
+				}
+				i++;
+				if (i < nouniquesLength) {
+					sb.append(",");
+				}
+				sb.append("\n");
+			}
+			if(charset_type == 0){
+				sb.append(") ENGINE="+ENGINE_NAME+"  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;\n");
+			}else{
+				sb.append(") ENGINE="+ENGINE_NAME+"  DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1 ;\n");
+			}
+			
+			return sb.toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	// ///////////////////////////////////////////////////////////////////////
 	public static String getType(ResultSetMetaData rsmd, String columnName)
 			throws SQLException {

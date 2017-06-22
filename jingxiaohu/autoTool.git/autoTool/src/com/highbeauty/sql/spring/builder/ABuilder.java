@@ -31,7 +31,7 @@ public class ABuilder {
 			Map<String,String>  map = DbInfoUtil.returnRemarkInfo(ip, port, databaseName, user, password, true, "UTF-8", tablename);
 			BeanBuild(is_maven,conn, tablename, pkg, src,map);
 			conn = SqlEx.newMysqlConnection(ip,port, databaseName, user, password);
-			DaoBuild(is_maven,conn, tablename, pkg, src);
+			DaoBuild(is_maven,conn, tablename, pkg, src,map);
 			conn = SqlEx.newMysqlConnection(ip,port, databaseName, user, password);
 			map = DbInfoUtil.returnRemarkInfoDOC(ip, port, databaseName, user, password, true, "UTF-8", tablename);
 			DocBuild(is_maven,conn, tablename, pkg, src,map);
@@ -99,12 +99,12 @@ public class ABuilder {
 	}
 
 	public static void DaoBuild(boolean is_maven,Connection conn, String tablename, String pkg,
-			boolean src) throws Exception {
+			boolean src,Map<String,String> map_comment) throws Exception {
 
 		String sql = String.format("SELECT * FROM `%s` LIMIT 1", tablename);
 		ResultSet rs = SqlEx.executeQuery(conn, sql);
 		NewDaoBuilder builder = new NewDaoBuilder();
-		String xml = builder.build(conn, rs, pkg + "dao", pkg + "bean");
+		String xml = builder.build(conn, rs, pkg + "dao", pkg + "bean",map_comment);
 		System.out.println(xml);
 		String filename = file(is_maven,pkg, src, "dao", tablename + "Dao", "java");
 		writeFile(filename, xml);

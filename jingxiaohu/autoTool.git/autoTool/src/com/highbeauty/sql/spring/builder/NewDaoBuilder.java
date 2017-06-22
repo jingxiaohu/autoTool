@@ -20,11 +20,11 @@ public class NewDaoBuilder {
  
   ResultSet rs = SqlEx.executeQuery(conn, sql);
   NewDaoBuilder builder = new NewDaoBuilder();
-  String xml = builder.build(conn, rs, "co.test.dao", "co.test.bean");
+  String xml = builder.build(conn, rs, "co.test.dao", "co.test.bean",null);
   System.out.println(xml);
  }
  public String build(Connection conn, ResultSet rs, String pkg,
-   String beanPkg) throws Exception {
+   String beanPkg,Map<String,String> map_comment) throws Exception {
   ResultSetMetaData rsmd = rs.getMetaData();
   String tableName = rsmd.getTableName(1);
   Map<String, List<String>> indexs = IndexBuilder.getIndex(conn, rsmd);
@@ -118,7 +118,8 @@ public class NewDaoBuilder {
   }
 
   // create table
-  sb.append(generateCreateTable(conn, rs, rsmd, tableName));
+//  sb.append(generateCreateTable(conn, rs, rsmd, tableName));
+  sb.append(generateCreateTable(conn, rs, rsmd, tableName,map_comment));
   // truncate
   sb.append(generateTruncate(rsmd, tableName));
   // repair
@@ -911,7 +912,7 @@ public class NewDaoBuilder {
   sb.append("\r\n");
   return sb.toString();
  }
- static String generateCreateTable(Connection conn, ResultSet rs,
+/* static String generateCreateTable(Connection conn, ResultSet rs,
    ResultSetMetaData rsmd, String tableName) throws Exception {
   String createSql = SqlEx.createMysqlTable(conn, rs, tableName);
   String[] ss = createSql.split("\n");
@@ -946,7 +947,47 @@ public class NewDaoBuilder {
   sb.append("    }\r\n");
   sb.append("\r\n");
   return sb.toString();
- }
+ }*/
+ 
+ 
+ static String generateCreateTable(Connection conn, ResultSet rs,
+		   ResultSetMetaData rsmd, String tableName,Map<String,String>  map_comment) throws Exception {
+		  String createSql = SqlEx.createMysqlTable_Comment(conn, rs, tableName,map_comment, 1, 1);
+		  String[] ss = createSql.split("\n");
+		  StringBuffer sb2 = new StringBuffer();
+		  int i = 0;
+		  for (String s : ss) {
+		   if(i > 0)
+		    sb2.append("                ");
+		   sb2.append("\"");
+		   sb2.append(s);
+		   sb2.append("\"");
+		   i ++;
+		   if(i < ss.length){
+		    sb2.append(" +");
+		    sb2.append("\n ");
+		   }
+		  }
+		  StringBuffer sb = new StringBuffer();
+		  sb.append("    //创建表\r\n");
+		  sb.append("    public void createTable(String TABLENAME2) throws SQLException{\r\n");
+		  sb.append("        try{\r\n");
+		  sb.append("            String sql;\r\n");
+		  sb.append("            sql = "+sb2.toString()+";\r\n");
+		  sb.append("            Map<String,String> params = new HashMap<String,String>();\r\n");
+		  sb.append("            params.put(\"TABLENAME\", TABLENAME2);\r\n");
+		  sb.append("            sql  = EasyTemplate.make(sql, params);\r\n");
+		  sb.append("            _np.getJdbcOperations().execute(sql);\r\n");
+		  sb.append("        }catch(Exception e){\r\n");
+		  sb.append("            log.error(\"createTable\",e);").append("\r\n");
+		  sb.append("            throw new SQLException(\"createTable is error\", e);\r\n");
+		  sb.append("        }\r\n");
+		  sb.append("    }\r\n");
+		  sb.append("\r\n");
+		  return sb.toString();
+		 }
+ 
+ 
  static String generateTruncate(ResultSetMetaData rsmd, String tableName) {
   StringBuffer sb = new StringBuffer();
   sb.append("    //清空表\r\n");
