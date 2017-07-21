@@ -10,7 +10,7 @@ import com.highbeauty.pinyin.PinYin;
 import com.highbeauty.util.DbInfoUtil;
 
 public class ABuilder {
-	
+
 	/**
 	 * @param src:false:不写在SRC下 true:写在SRC下
 	 * @param pkg :"test.dao."
@@ -20,29 +20,30 @@ public class ABuilder {
 	 * @param user:root
 	 * @param password:root
 	 * @param databaseName:bag_radio
+	 * @param  moduleName MAVEN项目中的module
 	 * @throws Throwable
 	 */
-	public static void  AutoCoder(boolean is_maven,boolean src,String pkg,String[] tablenames,String ip,int port,String user,String password,String databaseName) throws Throwable{ 
+	public static void  AutoCoder(boolean is_maven,boolean src,String moduleName,String pkg,String[] tablenames,String ip,int port,String user,String password,String databaseName) throws Throwable{
 //		boolean immediately = true;
 //		String appcontext = "";
 		Connection conn = null;
 		for (String tablename : tablenames) {
 			conn = SqlEx.newMysqlConnection(ip,port, databaseName, user, password);
 			Map<String,String>  map = DbInfoUtil.returnRemarkInfo(ip, port, databaseName, user, password, true, "UTF-8", tablename);
-			BeanBuild(is_maven,conn, tablename, pkg, src,map);
+			BeanBuild(moduleName,is_maven,conn, tablename, pkg, src,map);
 			conn = SqlEx.newMysqlConnection(ip,port, databaseName, user, password);
-			DaoBuild(is_maven,conn, tablename, pkg, src,map);
+			DaoBuild(moduleName,is_maven,conn, tablename, pkg, src,map);
 			conn = SqlEx.newMysqlConnection(ip,port, databaseName, user, password);
 			map = DbInfoUtil.returnRemarkInfoDOC(ip, port, databaseName, user, password, true, "UTF-8", tablename);
-			DocBuild(is_maven,conn, tablename, pkg, src,map);
+			DocBuild(moduleName,is_maven,conn, tablename, pkg, src,map);
 			//conn = SqlEx.newMysqlConnection(ip,port, databaseName, user, password);
 			//ServiceBuild(conn, tablename, appcontext, pkg, src, immediately);
 		}
-		
+
 		//创建DAO代理工厂
-		DaoFactoryBuild(is_maven,tablenames, pkg, src);
-		
-	} 
+		DaoFactoryBuild(moduleName,is_maven,tablenames, pkg, src);
+
+	}
 
 	/**
 	 * @param args
@@ -74,7 +75,7 @@ public class ABuilder {
 		ServiceBuild(conn, tablename, appcontext, pkg, src, immediately);
 		//EntityBuild(conn, tablename, appcontext, pkg, src, immediately);
 	}*/
-	public static  void main(String[] args) throws Throwable { 
+	public static  void main(String[] args) throws Throwable {
 		boolean src = true;
 		String pkg = "com.wradio.";
 		String[] tablenames = {"t_radio"};
@@ -85,7 +86,7 @@ public class ABuilder {
 		String databaseName = "bag_radio";
 //		com.highbeauty.sql.spring.builder.ABuilder.AutoCoder(src, pkg, tablenames, ip, port, user, password, databaseName);
 	}
-	public static void BeanBuild(boolean is_maven,Connection conn, String tablename, String pkg,
+	public static void BeanBuild(String moduleName,boolean is_maven,Connection conn, String tablename, String pkg,
 			boolean src,Map<String,String> map) throws Exception {
 
 		String sql = String.format("SELECT * FROM `%s` LIMIT 1", tablename);
@@ -94,11 +95,14 @@ public class ABuilder {
 		String xml = builder.build(rs, pkg + "bean", true,map);
 		System.out.println(xml);
 		String filename = file(is_maven,pkg, src, "bean", tablename, "java");
+		if(moduleName != null && !"".equalsIgnoreCase(moduleName)){
+			filename = moduleName+File.separator+filename;
+		}
 		writeFile(filename, xml);
 		conn.close();
 	}
 
-	public static void DaoBuild(boolean is_maven,Connection conn, String tablename, String pkg,
+	public static void DaoBuild(String moduleName,boolean is_maven,Connection conn, String tablename, String pkg,
 			boolean src,Map<String,String> map_comment) throws Exception {
 
 		String sql = String.format("SELECT * FROM `%s` LIMIT 1", tablename);
@@ -107,21 +111,27 @@ public class ABuilder {
 		String xml = builder.build(conn, rs, pkg + "dao", pkg + "bean",map_comment);
 		System.out.println(xml);
 		String filename = file(is_maven,pkg, src, "dao", tablename + "Dao", "java");
+		if(moduleName != null && !"".equalsIgnoreCase(moduleName)){
+			filename = moduleName+File.separator+filename;
+		}
 		writeFile(filename, xml);
 		conn.close();
 
 	}
-	
-	public static void DaoFactoryBuild(boolean is_maven,String[] tablenames, String pkg,
+
+	public static void DaoFactoryBuild(String moduleName,boolean is_maven,String[] tablenames, String pkg,
 			boolean src) throws Exception {
 
 		NewDaoFactoryBuilder builder = new NewDaoFactoryBuilder();
 		String xml = builder.build(tablenames, pkg+ "dao");
 		System.out.println(xml);
 		String filename = file(is_maven,pkg, src, "dao", "DaoFactory", "java");
+		if(moduleName != null && !"".equalsIgnoreCase(moduleName)){
+			filename = moduleName+File.separator+filename;
+		}
 		writeFile(filename, xml);
 	}
-	
+
 
 	public static void ServiceBuild(boolean is_maven,Connection conn, String tablename,
 			String appcontext, String pkg, boolean src, boolean immediately)
@@ -175,7 +185,7 @@ public class ABuilder {
 | verify_list| 验证序列码|字符串|
 	 * @throws Exception
 	 */
-	public static void DocBuild(boolean is_maven,Connection conn, String tablename, String pkg,
+	public static void DocBuild(String moduleName,boolean is_maven,Connection conn, String tablename, String pkg,
 			boolean src,Map<String,String> map) throws Exception {
 
 		String sql = String.format("SELECT * FROM `%s` LIMIT 1", tablename);
@@ -184,15 +194,18 @@ public class ABuilder {
 		String xml = builder.build(rs,map);
 		System.out.println(xml);
 		String filename = file(is_maven,pkg, src, "doc", tablename, "TXT");
+		if(moduleName != null && !"".equalsIgnoreCase(moduleName)){
+			filename = moduleName+File.separator+filename;
+		}
 		writeFile(filename, xml);
 		conn.close();
 
 	}
-	
+
 	public static String file(boolean is_maven,String pkg, boolean src, String type,
 			String tablename, String ext) {
 		String path = StrEx.pkg2Path(pkg);
-		
+
 		if(is_maven){
 			//是maven项目
 			if (src)
@@ -200,7 +213,7 @@ public class ABuilder {
 			path = path + type + "/"
 					+ StrEx.upperFirst(PinYin.getShortPinYin(tablename)) + "."
 					+ ext;
-			
+
 		}else{
 			if (src)
 				path = "src/" + path;
@@ -208,8 +221,8 @@ public class ABuilder {
 					+ StrEx.upperFirst(PinYin.getShortPinYin(tablename)) + "."
 					+ ext;
 		}
-		
-		
+
+
 		return path;
 	}
 
