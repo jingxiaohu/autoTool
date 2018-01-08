@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="jxh-autoTool2018-1-8">
+    <output-path>$PROJECT_DIR$/out/artifacts/jxh_autoTool2018_1_8</output-path>
+    <root id="archive" name="jxh-autoTool2018-1-8.jar" />
+  </artifact>
+</component>

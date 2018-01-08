@@ -241,7 +241,7 @@ public class NewDaoBuilder {
   sb.append("            SqlParameterSource ps = new BeanPropertySqlParameterSource(bean);\r\n");
   sb.append("            KeyHolder keyholder = new GeneratedKeyHolder();\r\n");
   sb.append("            _np.update(sql, ps, keyholder);\r\n");
-  sb.append("            return keyholder.getKey().intValue();\r\n");
+  sb.append("            return keyholder.getKey().longValue();\r\n");
   sb.append("        }catch(Exception e){\r\n");
   sb.append("            //createTable(TABLENAME2);\r\n");
   sb.append("            log.error(\"insert\", e);").append("\r\n");
@@ -270,7 +270,7 @@ public class NewDaoBuilder {
   sb.append("            SqlParameterSource ps = new BeanPropertySqlParameterSource(bean);\r\n");
   //sb.append("            KeyHolder keyholder = new GeneratedKeyHolder();\r\n");
 //  sb.append("            _np.update(sql, ps, keyholder);\r\n");
-//  sb.append("            return keyholder.getKey().intValue();\r\n");
+//  sb.append("            return keyholder.getKey().longValue();\r\n");
   sb.append("            return _np.update(sql, ps);\r\n");
   sb.append("        }catch(Exception e){\r\n");
   sb.append("            //createTable(TABLENAME2);\r\n");
