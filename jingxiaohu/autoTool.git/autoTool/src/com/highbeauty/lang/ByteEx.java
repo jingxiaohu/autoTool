@@ -82,7 +82,7 @@ public class ByteEx {
 	}
 
 	public static int indexOf(final byte[] b, final byte[] sp, int start,
-			int end) {
+							  int end) {
 		if (b == null || sp == null)
 			return -1;
 		int len = b.length;
@@ -442,7 +442,7 @@ public class ByteEx {
 	}
 
 	public static byte[] append(final byte[] b1, final byte[] b2, int offset,
-			int length) {
+								int length) {
 		if (b1 == null || b2 == null)
 			return null;
 		if (b2.length <= 0 || b2.length <= offset
@@ -496,10 +496,10 @@ public class ByteEx {
 	}
 
 	public static void main(String[] args) {
-		byte[] b = "ÄãºÃ£¬xxx".getBytes();
+		byte[] b = "ä½ å¥½ï¼Œxxx".getBytes();
 		String s = bytesToString(b);
 		System.out.println(s);
-		
+
 		byte[] b2 = stringToBytes(s);
 		System.out.println(new String(b2));
 

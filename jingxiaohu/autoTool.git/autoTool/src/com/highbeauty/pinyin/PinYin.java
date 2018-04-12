@@ -39,10 +39,10 @@ public class PinYin {
 		return ret;
 	}
 
-	
+
 	public static List<String> getShortPy(String s){
 		List<String> r = getPy(s);
-		
+
 		List<String> ret = new ArrayList<String>();
 		for (String v : r) {
 			String v1 = v.substring(0, 1);
@@ -50,8 +50,8 @@ public class PinYin {
 		}
 		return ret;
 	}
-	
-	
+
+
 	public static String getPinYin(String s){
 		if(p == null || py == null){
 			py = new PinYin();
@@ -70,9 +70,9 @@ public class PinYin {
 				ret.append(v);
 			}
 		}
-		return ret.toString();	
+		return ret.toString();
 	}
-	
+
 	public static String getShortPinYin(String s){
 		if(p == null || py == null){
 			py = new PinYin();
@@ -89,22 +89,22 @@ public class PinYin {
 				ret.append(v);
 			}
 		}
-		return ret.toString();	
+		return ret.toString();
 	}
-	
+
 	public static void main(String[] args) {
-		List<String> z = PinYin.getPy("ÖÐÎÄ´ÓÀà¼Ì³ÐµÄ×Ö¶Î");
-		
+		List<String> z = PinYin.getPy("ä¸­æ–‡ä»Žç±»ç»§æ‰¿çš„å­—æ®µ");
+
 		System.out.println(z);
-		
-		z = PinYin.getShortPy("ÖÐÎÄ´ÓÀà¼Ì³ÐµÄ×Ö¶Î");
+
+		z = PinYin.getShortPy("ä¸­æ–‡ä»Žç±»ç»§æ‰¿çš„å­—æ®µ");
 		System.out.println(z);
-		
-		String s = PinYin.getPinYin("ÖÐÎÄ´ÓÀà¼Ì³ÐµÄ×Ö¶Î");
+
+		String s = PinYin.getPinYin("ä¸­æ–‡ä»Žç±»ç»§æ‰¿çš„å­—æ®µ");
 		System.out.println(s);
-		
-		s = PinYin.getShortPinYin("ÖÐÎÄ´ÓÀà¼Ì³ÐµÄ×Ö¶Î");
+
+		s = PinYin.getShortPinYin("ä¸­æ–‡ä»Žç±»ç»§æ‰¿çš„å­—æ®µ");
 		System.out.println(s);
-		
+
 	}
 }
