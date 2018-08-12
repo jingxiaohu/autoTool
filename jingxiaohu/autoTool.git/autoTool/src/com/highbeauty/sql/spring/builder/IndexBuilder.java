@@ -38,4 +38,33 @@ public class IndexBuilder {
 //		}
 		return m;
 	}
+
+	/**
+	 * 获取主键名字
+	 * @param connection
+	 * @param tableName
+	 * @return
+	 * @throws Exception
+	 */
+	public String gainPrimaryKey(Connection connection,String tableName){
+		Object primaryKeyName = null;
+		try {
+			DatabaseMetaData dbMeta = connection.getMetaData();
+			ResultSet pkRSet = dbMeta.getPrimaryKeys(null, null, tableName);
+/*        System.err.println("****** Comment ******");
+        System.err.println("TABLE_CAT : "+pkRSet.getObject(1));
+        System.err.println("TABLE_SCHEM: "+pkRSet.getObject(2));
+        System.err.println("TABLE_NAME : "+pkRSet.getObject(3));
+        System.err.println("COLUMN_NAME: "+pkRSet.getObject(4));
+        System.err.println("KEY_SEQ : "+pkRSet.getObject(5));
+        System.err.println("PK_NAME : "+pkRSet.getObject(6));
+        System.err.println("****** ******* ******");*/
+			while( pkRSet.next() ) {
+				primaryKeyName =   pkRSet.getObject(4);
+			}
+		} catch (Exception e) {
+//			log.error("获取主键名字失败",e);
+		}
+		return  primaryKeyName == null ? null:primaryKeyName.toString();
+	}
 }
